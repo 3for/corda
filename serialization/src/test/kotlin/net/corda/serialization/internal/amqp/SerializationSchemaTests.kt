@@ -2,11 +2,11 @@ package net.corda.serialization.internal.amqp
 
 import net.corda.core.serialization.*
 import net.corda.core.utilities.ByteSequence
-import net.corda.serialization.internal.*
 import net.corda.serialization.internal.BuiltInExceptionsWhitelist
+import net.corda.serialization.internal.CordaSerializationMagic
 import net.corda.serialization.internal.GlobalTransientClassWhiteList
+import net.corda.serialization.internal.SerializationContextImpl
 import org.junit.Test
-import java.util.concurrent.ConcurrentHashMap
 import kotlin.test.assertEquals
 
 // Make sure all serialization calls in this test don't get stomped on by anything else
@@ -24,9 +24,11 @@ class TestSerializerFactory(
         cl: ClassLoader
 ) : SerializerFactory(wl, cl) {
     var registerCount = 0
+    val things = HashSet<CustomSerializer<*>>()
 
     override fun register(customSerializer: CustomSerializer<out Any>) {
         ++registerCount
+        things.add(customSerializer)
         return super.register(customSerializer)
     }
 }
@@ -91,11 +93,12 @@ class SerializationSchemaTests {
 
         val c = C(1)
         val testSerializationFactory = TestSerializationFactory()
-        val expectedCustomSerializerCount = 40
+        val expectedCustomSerializerCount = 43
 
         assertEquals(0, testFactory.registerCount)
         c.serialize(testSerializationFactory, TESTING_CONTEXT)
         assertEquals(expectedCustomSerializerCount, testFactory.registerCount)
+        assertEquals(testFactory.things.size, testFactory.registerCount)
         c.serialize(testSerializationFactory, TESTING_CONTEXT)
         assertEquals(expectedCustomSerializerCount, testFactory.registerCount)
     }

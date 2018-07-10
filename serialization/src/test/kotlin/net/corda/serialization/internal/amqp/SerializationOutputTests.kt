@@ -519,12 +519,12 @@ class SerializationOutputTests(private val compression: CordaSerializationEncodi
 
     @Test
     fun `java optionals should serialize`() {
-        val (factory1, factory2) = listOf(SerializerFactory(AllWhitelist, ClassLoader.getSystemClassLoader()),
+        val (factory1) = listOf(SerializerFactory(AllWhitelist, ClassLoader.getSystemClassLoader()),
                 SerializerFactory(AllWhitelist, ClassLoader.getSystemClassLoader())).map { it.also { it.register(OptionalSerializer(it)) } }
 
 
         val obj = Optional.ofNullable("YES")
-        serdes(obj, factory1, factory2)
+        serdes(obj, factory1, factory1)
     }
 
     @Test
