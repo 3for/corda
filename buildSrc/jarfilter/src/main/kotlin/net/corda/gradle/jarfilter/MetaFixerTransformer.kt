@@ -219,7 +219,7 @@ internal class ClassMetaFixerTransformer(
     ProtoBuf.Class::parseFrom
 ) {
     override val typeTable = TypeTable(message.typeTable)
-    override val classDescriptor = "L${nameResolver.getString(message.fqName)};"
+    override val classDescriptor = "L${nameResolver.getString(message.fqName).replace('.', '$')};"
     override val classKind: ProtoBuf.Class.Kind = CLASS_KIND.get(message.flags)
     override val properties = mutableList(message.propertyList)
     override val functions = mutableList(message.functionList)
